@@ -1,0 +1,82 @@
+.products {
+    padding: 32px;
+    margin-top: -30px;
+
+    h2 {
+        font-size: 24px;
+        font-weight: bold;
+    }
+}
+
+.product {
+    
+    &-grid {
+        display: flex; 
+        flex-wrap: wrap; 
+        justify-content: space-between;
+        gap: 16px;
+        margin-top: 16px;
+
+        @media (max-width: 768px) {
+            justify-content: center;  // Центрируем карточки на мобильных
+        }
+    
+        @media (max-width: 480px) {
+            justify-content: center;
+            gap: 8px; // Уменьшаем зазор между карточками на мобильных
+        }
+    }
+
+    &-card {
+        text-align: center;
+        width: 350px;
+        text-decoration: none;
+        color: inherit;
+
+        @media (max-width: 768px) {
+        width: 45%;  // Карточки занимают 45% ширины на планшетах
+    }
+
+    @media (max-width: 480px) {
+        width: 90%;  // Карточки занимают почти всю ширину на мобильных устройствах
+    }
+
+        img {
+            width: 100%;
+            height: 300px;
+            max-height: none;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+    }
+
+    &-name {
+        margin-top: -15px;
+        font-size: 18px;
+        font-weight: 500;
+    }
+
+    &-price {
+        color: gray;
+        margin-top: -10px;
+    }
+}
+
+.button {
+    display: flex;
+    justify-content: center;
+}
+
+.view-all {
+    margin-top: 16px auto;
+    padding: 8px 16px;
+    border: 2px solid black;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    display: block;
+    text-align: center;
+    background-color: white;
+    text-decoration: none;
+    color: inherit;
+}
