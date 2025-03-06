@@ -3,22 +3,32 @@ import {Link, useParams} from 'react-router-dom';
 
 import AppBanner from '../../appBanner/appBanner';
 import {topProducts, tshirts, hoodies} from '../../../data/products';
+import Spinner from '../../spinner/Spinner';
 import './productPage.scss';
 
 const ProductPage = () => {
     const {category} = useParams();
     const [productList, setProductList] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         console.log('Current category:', category);
+        setLoading(true);
+        let products = [];
         if (category === 'topProducts') {
-            setProductList(topProducts);
+            products = topProducts;
         } else if (category === 'tshirts') {
-            setProductList(tshirts);
+           products = tshirts;
         } else if (category === 'hoodies') {
-            setProductList(hoodies);
+            products = hoodies;
         }
+        setProductList(products);
+        setLoading(false);
     }, [category]);
+
+    if (loading) {
+        return <Spinner />;
+    }
     
 
     return (

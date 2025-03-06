@@ -2,12 +2,15 @@ import React, {useState, useEffect} from 'react';
 import {Link} from 'react-router-dom';
 
 import {topProducts, tshirts, hoodies} from '../../data/products';
+import Spinner from '../spinner/Spinner';
 import './productList.scss';
 
 const ProductList = ({category}) => {
     const [productList, setProductList] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        setLoading(true);
         if (category === 'topProducts') {
             setProductList(topProducts);
         } else if (category === 'tshirts') {
@@ -15,8 +18,12 @@ const ProductList = ({category}) => {
         } else if (category === 'hoodies') {
             setProductList(hoodies);
         }
+        setLoading(false);
     }, [category]);
     
+    if (loading) {
+        return <Spinner />;
+    }
 
     return (
             <section className="products">

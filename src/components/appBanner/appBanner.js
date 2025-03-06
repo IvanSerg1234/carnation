@@ -40,7 +40,9 @@ const AppBanner = () => {
                     </form>
                 </div>
                 <div className="icons">
-                    <FaShoppingCart className="icon" />
+                    <Link to="/cart">
+                        <FaShoppingCart className="icon" />
+                    </Link>
                     <FaUser className="icon" />
                 </div>
             </header>

@@ -1,20 +1,26 @@
 import React, {useState, useEffect} from "react";
-import {useParams} from "react-router-dom";
+import {useParams, useNavigate} from "react-router-dom";
 
 import AppBanner from "../../appBanner/appBanner";
+import Spinner from "../../spinner/Spinner";
 import {topProducts, tshirts, hoodies} from "../../../data/products";
+import {addToCart} from "../../../data/cart";
 
 import './productDetail.scss';
 
 const ProductDetail = () => {
     const {category, id} = useParams();
+    const navigate = useNavigate();
     const [product, setProduct] = useState(null);
     const [selectedImage, setSelectedImage] = useState(null);
     const [quantity, setQuantity] = useState(1);
     const [selectedSize, setSelectedSize] = useState('M');
     const [selectedColor, setSelectedColor] = useState('White');
+    const [loading, setLoading] = useState(true);
+    const [message, setMessage] = useState('');
 
     useEffect(() => {
+        setLoading(true);
         let allProducts = [];
         if (category === 'topProducts') {
             allProducts = topProducts;
@@ -32,6 +38,7 @@ const ProductDetail = () => {
             console.error("Product not found");
             setProduct(null); // Or set some default state
         }
+        setLoading(false);
     }, [category, id]);  
 
     useEffect(() => {
@@ -40,12 +47,45 @@ const ProductDetail = () => {
         }
     }, [product]);
 
+    if (loading) {
+        return <Spinner />;
+    }
+
     if (!product) {
         return <p>Loading...</p>;
     }
 
     const handleQuantityChange = (type) => {
         setQuantity((prev) => (type === 'increase' ? prev + 1 : prev > 1 ? prev - 1 : 1));
+    }
+
+    const handleAddToCart = () => {
+        const cartItem = {
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            image: product.image,
+            quantity,
+            size: selectedSize,
+            color: selectedColor
+        }
+        addToCart(cartItem);
+        setMessage('Product added to cart');
+        setTimeout(() => setMessage(''), 2000);
+    };
+
+    const handleBuyNow = () => {
+        const cartItem = {
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            image: product.image,
+            quantity,
+            size: selectedSize,
+            color: selectedColor
+        }
+        addToCart(cartItem);
+        navigate('/checkout');
     }
 
     return (
@@ -60,7 +100,7 @@ const ProductDetail = () => {
                                 key={index}
                                 className="image-thumbnail"
                                 src={img}
-                                alt={`Product image ${index + 1}`}
+                                alt={`${product.name} view ${index + 1}`}
                             />
                         ))}
                     </div>
@@ -108,8 +148,19 @@ const ProductDetail = () => {
                     </div>
 
                     <div className="buttons">
-                        <button className="add-to-cart">Add to cart</button>
-                        <button className="buy-now">Buy it now</button>
+                        <button 
+                            className="add-to-cart"
+                            onClick={handleAddToCart}
+                            >
+                                Add to cart
+                            </button>
+                        <button 
+                            className="buy-now"
+                            onClick={handleBuyNow}
+                            >
+                                Buy it now
+                            </button>
+                        {message && <p className="cart-message">{message}</p>}
                     </div>
 
                     <div className="size-table">
