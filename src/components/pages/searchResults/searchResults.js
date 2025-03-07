@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {useLocation, Link} from 'react-router-dom';
 
 import AppBanner from '../../appBanner/appBanner';
-import {topProducts, tshirts, hoodies} from '../../../data/products';
+import {products} from '../../../data/products';
 import '../../productList/productList.scss';
 
 const SearchResults = () => {
@@ -12,16 +12,7 @@ const SearchResults = () => {
     const [filteredProducts, setFilteredProducts] = useState([]);
 
     useEffect(() => {
-        const allProducts = [...topProducts, ...tshirts, ...hoodies];
-
-        const seenNames = new Set();
-
-        const results = allProducts.filter((product) => {
-
-            if (seenNames.has(product.name)) {
-                return false;
-            }
-            seenNames.add(product.name);
+        const results = products.filter((product) => {
             return product.name.toLowerCase().includes(searchQuery.toLowerCase())
         });
         setFilteredProducts(results);
@@ -39,7 +30,7 @@ const SearchResults = () => {
                                 console.log(product.category, product.id);
                                 if (!product.name || !product.image) return null;
                                 return (
-                                    <Link to={`/product/${product.category}/${product.id}`} key={`${product.id}-${product.category}`} className="product-card">
+                                    <Link to={`/product/${product.name}`} key={`${product.id}-${product.category}`} className="product-card">
                                         <img src={product.image} alt={product.name} />
                                         <p className="product-name">{product.name}</p>
                                         <p className="product-price">{product.price}</p>

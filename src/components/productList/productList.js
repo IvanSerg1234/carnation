@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {Link} from 'react-router-dom';
 
-import {topProducts, tshirts, hoodies} from '../../data/products';
+import {getProductsByCategory} from '../../data/products';
 import Spinner from '../spinner/Spinner';
 import './productList.scss';
 
@@ -11,13 +11,8 @@ const ProductList = ({category}) => {
 
     useEffect(() => {
         setLoading(true);
-        if (category === 'topProducts') {
-            setProductList(topProducts);
-        } else if (category === 'tshirts') {
-            setProductList(tshirts);
-        } else if (category === 'hoodies') {
-            setProductList(hoodies);
-        }
+        const products = getProductsByCategory(category);
+        setProductList(products);
         setLoading(false);
     }, [category]);
     
@@ -31,7 +26,7 @@ const ProductList = ({category}) => {
                 <div className="product-grid">
                     {productList.slice(0, 4).map((product) => {
                         return (
-                            <Link to={`/product/${category}/${product.id}`} key={product.id} className="product-card">
+                            <Link to={`/product/${product.name}`} key={product.id} className="product-card">
                                 <img src={product.image} alt={product.name} />
                                 <p className="product-name">{product.name}</p>
                                 <p className="product-price">{product.price}</p>
@@ -40,7 +35,7 @@ const ProductList = ({category}) => {
                     })}
                 </div>
                 <div className="button">
-                    <Link to={`/productPage/${category}`} className="view-all">View all</Link>
+                    <Link to={`/category/${category}`} className="view-all">View all</Link>
                 </div>
             </section>
     )

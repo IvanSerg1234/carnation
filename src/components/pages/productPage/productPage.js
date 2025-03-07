@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {Link, useParams} from 'react-router-dom';
 
 import AppBanner from '../../appBanner/appBanner';
-import {topProducts, tshirts, hoodies} from '../../../data/products';
+import {getProductsByCategory} from '../../../data/products';
 import Spinner from '../../spinner/Spinner';
 import './productPage.scss';
 
@@ -14,14 +14,7 @@ const ProductPage = () => {
     useEffect(() => {
         console.log('Current category:', category);
         setLoading(true);
-        let products = [];
-        if (category === 'topProducts') {
-            products = topProducts;
-        } else if (category === 'tshirts') {
-           products = tshirts;
-        } else if (category === 'hoodies') {
-            products = hoodies;
-        }
+        const products = getProductsByCategory(category);
         setProductList(products);
         setLoading(false);
     }, [category]);
@@ -43,7 +36,7 @@ const ProductPage = () => {
             <div className="product-grid">
                 {productList.map((product) => {
                     return (
-                        <Link to={`/product/${category}/${product.id}`} key={product.id} className="product-card">
+                        <Link to={`/product/${product.name}`} key={product.id} className="product-card">
                             <img src={product.image} alt={product.name} />
                             <p className="product-name">{product.name}</p>
                             <p className="product-price">{product.price}</p>

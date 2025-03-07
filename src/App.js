@@ -7,6 +7,8 @@ import ProductDetail from './components/pages/productDetail/productDetail';
 import SearchResults from './components/pages/searchResults/searchResults';
 import Cart from './components/pages/cartPage/cartPage';
 import Checkout from './components/pages/checkoutPage/checkoutPage';
+import Login from './components/pages/loginPage/loginPage';
+import Orders from './components/pages/ordersPage/ordersPage';
 
 import './App.css';
 
@@ -15,11 +17,13 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/productPage/:category" element={<ProductPage />} />
-        <Route path="/product/:category/:id" element={<ProductDetail />} />
+        <Route path="/category/:category" element={<ProductPage />} />
+        <Route path="/product/:productName" element={<ProductDetail />} />
         <Route path="/search" element={<SearchResults/>} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/orders" element={<Orders />} />
       </Routes>
     </Router>
   );

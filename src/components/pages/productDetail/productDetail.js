@@ -3,13 +3,13 @@ import {useParams, useNavigate} from "react-router-dom";
 
 import AppBanner from "../../appBanner/appBanner";
 import Spinner from "../../spinner/Spinner";
-import {topProducts, tshirts, hoodies} from "../../../data/products";
+import {getProductByName} from "../../../data/products";
 import {addToCart} from "../../../data/cart";
 
 import './productDetail.scss';
 
 const ProductDetail = () => {
-    const {category, id} = useParams();
+    const {productName} = useParams();
     const navigate = useNavigate();
     const [product, setProduct] = useState(null);
     const [selectedImage, setSelectedImage] = useState(null);
@@ -21,31 +21,17 @@ const ProductDetail = () => {
 
     useEffect(() => {
         setLoading(true);
-        let allProducts = [];
-        if (category === 'topProducts') {
-            allProducts = topProducts;
-        } else if (category === 'tshirts') {
-            allProducts = tshirts;
-        } else if (category === 'hoodies') {
-            allProducts = hoodies;
-        }
-
-        const selectedProduct = allProducts.find(p => p.id === parseInt(id));
+        const selectedProduct = getProductByName(productName);
 
         if (selectedProduct) {
             setProduct(selectedProduct);
+            setSelectedImage(selectedProduct.image);
         } else {
             console.error("Product not found");
             setProduct(null); // Or set some default state
         }
         setLoading(false);
-    }, [category, id]);  
-
-    useEffect(() => {
-        if (product) {
-            setSelectedImage(product.image);
-        }
-    }, [product]);
+    }, [productName]);  
 
     if (loading) {
         return <Spinner />;

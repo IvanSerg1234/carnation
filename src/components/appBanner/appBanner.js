@@ -1,22 +1,29 @@
 import {FaSearch, FaShoppingCart, FaUser} from 'react-icons/fa';
 import {Link, useNavigate} from 'react-router-dom';
 import {useState} from 'react';
+import {getCurrentUser, logoutUser} from '../../data/auth';
 
 import './appBanner.scss';
 
 const AppBanner = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const navigate = useNavigate();
+    const currentUser = getCurrentUser();
 
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);
-    }
+    };
 
     const handleSearchSubmit = (e) => {
         e.preventDefault();
         if (searchQuery.trim()) {
             navigate(`/search?q=${searchQuery}`);
         }
+    };
+
+    const handleLogout = () => {
+        logoutUser();
+        navigate('/');
     }
 
     return (
@@ -43,7 +50,18 @@ const AppBanner = () => {
                     <Link to="/cart">
                         <FaShoppingCart className="icon" />
                     </Link>
-                    <FaUser className="icon" />
+                    {currentUser ? (
+                        <>
+                            <Link to="/orders">
+                                <FaUser className="icon"/>
+                            </Link>
+                            <button onClick={handleLogout} className="logout-button">Logout</button>
+                        </>
+                    ) : (
+                        <Link to="/login">
+                            <FaUser className="icon"/>
+                        </Link>
+                    )}
                 </div>
             </header>
         </div>
