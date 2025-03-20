@@ -1,7 +1,7 @@
-import React, {useState} from 'react';
-import {useNavigate} from 'react-router-dom';
-import {loginUser} from '../../../data/auth';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AppBanner from '../../appBanner/appBanner';
+import { loginUser } from '../../../backend/prisma/data/auth';
 
 import './loginPage.scss';
 
@@ -11,19 +11,24 @@ const Login = () => {
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
 
-        if (loginUser(email, password)) {
-            navigate('/orders');
-        } else {
-            setError('Invalid email or password');
+        try {
+            const success = await loginUser(email, password);
+            if (success) {
+                navigate('/orders');
+            } else {
+                setError('Failed to login');
+            }
+        } catch (error) {
+            setError(error.message || 'Failed to login');
         }
     };
 
     return (
         <div className="container">
-            <AppBanner/>
+            <AppBanner />
             <div className="login">
                 <h2>Login</h2>
                 {error && <div className="error-message">{error}</div>}
@@ -35,8 +40,9 @@ const Login = () => {
                             id="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
+                            placeholder="example@gmail.com"
                             required
-                            />
+                        />
                     </div>
                     <div className="form-group">
                         <label htmlFor="password">Password</label>
@@ -46,7 +52,7 @@ const Login = () => {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
-                            />
+                        />
                     </div>
                     <button type="submit" className="button view-all">Log in</button>
                 </form>

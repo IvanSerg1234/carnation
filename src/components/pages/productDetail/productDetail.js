@@ -1,15 +1,14 @@
-import React, {useState, useEffect} from "react";
-import {useParams, useNavigate} from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 
 import AppBanner from "../../appBanner/appBanner";
 import Spinner from "../../spinner/Spinner";
-import {getProductByName} from "../../../data/products";
-import {addToCart} from "../../../data/cart";
+import { addToCart } from "../../../backend/prisma/data/cart";
 
 import './productDetail.scss';
 
 const ProductDetail = () => {
-    const {productName} = useParams();
+    const { productName } = useParams();
     const navigate = useNavigate();
     const [product, setProduct] = useState(null);
     const [selectedImage, setSelectedImage] = useState(null);
@@ -18,19 +17,29 @@ const ProductDetail = () => {
     const [selectedColor, setSelectedColor] = useState('White');
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState('');
+    const token = localStorage.getItem('token');
 
     useEffect(() => {
         setLoading(true);
-        const selectedProduct = getProductByName(productName);
-
-        if (selectedProduct) {
-            setProduct(selectedProduct);
-            setSelectedImage(selectedProduct.image);
-        } else {
-            console.error("Product not found");
-            setProduct(null); // Or set some default state
-        }
-        setLoading(false);
+        const fetchProduct = async () => {
+            try {
+                const response = await fetch(`http://localhost:3000/products/${productName}`);
+                if (response.ok) {
+                    const productData = await response.json();
+                    setProduct(productData);
+                    setSelectedImage(productData.image);
+                } else {
+                    console.error("Product not found");
+                    setProduct(null);
+                }
+            } catch (error) {
+                console.error("Error fetching product:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        
+        fetchProduct();
     }, [productName]);  
 
     if (loading) {
@@ -38,26 +47,44 @@ const ProductDetail = () => {
     }
 
     if (!product) {
-        return <p>Loading...</p>;
+        return <p>Product not found</p>;
     }
 
     const handleQuantityChange = (type) => {
         setQuantity((prev) => (type === 'increase' ? prev + 1 : prev > 1 ? prev - 1 : 1));
     }
 
-    const handleAddToCart = () => {
+    const handleAddToCart = async () => {
         const cartItem = {
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            image: product.image,
+            productId: product.id,
             quantity,
             size: selectedSize,
             color: selectedColor
         }
-        addToCart(cartItem);
-        setMessage('Product added to cart');
-        setTimeout(() => setMessage(''), 2000);
+        
+        try {
+            const response = await fetch('http://localhost:3000/cart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify(cartItem),
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                setMessage(result.message || 'Product added to cart');
+                setTimeout(() => setMessage(''), 3000);
+            } else {
+                const errorData = await response.json();
+                console.error(errorData.error);
+                setMessage(errorData.error || 'Failed to add product to cart');
+            }
+        } catch (error) {
+            console.error('Error adding product to cart:', error);
+            setMessage('Error adding product to cart');
+        }
     };
 
     const handleBuyNow = () => {
@@ -76,8 +103,8 @@ const ProductDetail = () => {
 
     return (
         <div>
-            <AppBanner/>
-                <div className="product-detail">
+            <AppBanner />
+            <div className="product-detail">
                 <div className="product-images">
                     <img src={selectedImage} alt={product.name} className="main-image" />
                     <div className="image-container">
@@ -87,6 +114,7 @@ const ProductDetail = () => {
                                 className="image-thumbnail"
                                 src={img}
                                 alt={`${product.name} view ${index + 1}`}
+                                onClick={() => setSelectedImage(img)}
                             />
                         ))}
                     </div>
@@ -137,15 +165,15 @@ const ProductDetail = () => {
                         <button 
                             className="add-to-cart"
                             onClick={handleAddToCart}
-                            >
-                                Add to cart
-                            </button>
+                        >
+                            Add to cart
+                        </button>
                         <button 
                             className="buy-now"
                             onClick={handleBuyNow}
-                            >
-                                Buy it now
-                            </button>
+                        >
+                            Buy it now
+                        </button>
                         {message && <p className="cart-message">{message}</p>}
                     </div>
 

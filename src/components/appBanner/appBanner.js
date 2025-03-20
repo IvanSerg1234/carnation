@@ -1,14 +1,28 @@
 import {FaSearch, FaShoppingCart, FaUser} from 'react-icons/fa';
 import {Link, useNavigate} from 'react-router-dom';
-import {useState} from 'react';
-import {getCurrentUser, logoutUser} from '../../data/auth';
+import {useState, useEffect} from 'react';
+import {getCurrentUserAPI, logoutUserAPI} from '../../backend/prisma/data/auth';
 
 import './appBanner.scss';
 
 const AppBanner = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const navigate = useNavigate();
-    const currentUser = getCurrentUser();
+    const [currentUser, setCurrentUser] = useState(null);
+
+    useEffect(() => {
+        const fetchCurrentUser = async () => {
+            try {
+                const user = await getCurrentUserAPI();
+                setCurrentUser(user);
+            } catch (error) {
+                console.error('Failed to fetch user:', error);
+                setCurrentUser(null);
+            }
+        };
+
+        fetchCurrentUser();
+    }, [])
 
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);
@@ -21,10 +35,15 @@ const AppBanner = () => {
         }
     };
 
-    const handleLogout = () => {
-        logoutUser();
-        navigate('/');
-    }
+    const handleLogout = async () => {
+       try {
+            await logoutUserAPI();
+            setCurrentUser(null);
+            navigate('/');
+       } catch (error) {
+        console.error('Logout failed:', error);
+       }
+    };
 
     return (
         <div className="container">

@@ -1,19 +1,50 @@
-import React from 'react';
-import {getCurrentUser} from '../../../data/auth';
-import {getOrders} from '../../../data/orders';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AppBanner from '../../appBanner/appBanner';
 
 import './ordersPage.scss';
 
 const Orders = () => {
-    const user = getCurrentUser();
-    const orders = getOrders().filter(order => order.email === user.email);
+    const [orders, setOrders] = useState([]);
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            navigate('/login');
+            return;
+        }
+
+        const fetchOrders = async () => {
+            try {
+                const response = await fetch('http://localhost:3000/orders', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch orders');
+                }
+
+                const data = await response.json();
+                setOrders(data);
+            } catch (error) {
+                setError(error.message);
+            }
+        };
+
+        fetchOrders();
+    }, [navigate]);
 
     return (
         <div className="container">
-            <AppBanner/>
+            <AppBanner />
             <div className="orders">
                 <h2>Your Orders</h2>
+                {error && <div className="error-message">{error}</div>}
                 {orders.length === 0 ? (
                     <p>You have no orders</p>
                 ) : (
